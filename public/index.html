@@ -4,28 +4,32 @@
     <title>Simple Map</title>
     <meta name="viewport" content="initial-scale=1.0">
     <meta charset="utf-8">
-    <style>
-      /* Always set the map height explicitly to define the size of the div
-       * element that contains the map. */
-      #map {
-        height: 100%;
-      }
-      /* Optional: Makes the sample page fill the window. */
-      html, body {
-        height: 100%;
-        margin: 0;
-        padding: 0;
-      }
-    </style>
+
+    <link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css">
   </head>
   <body>
 
-    <div id="map"></div>
+    <div class="container">
+        <h1>Tweets</h1>
 
+        <form action="/api/subjects" method="post">
+            <div class="form-group">
+              <label for="exampleInputSubject1">Subject</label>
+              <input name="subject" type="text" class="form-control" id="subject" aria-describedby="subjectHelp" placeholder="Enter subject">
+              <small id="subjectHelp" class="form-text text-muted">Add a subject to search for on twitter</small>
+            </div>
+            <button type="submit" class="btn btn-primary">Add</button>
+          </form>
+    
+          <h3>Searches:</h3>
+          <div id="searches"></div>
+    
+          <h3>Results:</h3>
+          <div id="results"></div>
+
+    </div>
+  
     <!-- Our custom code lives in here -->
     <script src="app.js"></script>
-
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBB1GouO2xUF7nJnxiN9yZB0CRS3ABtKCI&callback=initMap"
-    async defer></script>
   </body>
 </html>

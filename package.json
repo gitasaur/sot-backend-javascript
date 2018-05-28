@@ -17,6 +17,9 @@
   },
   "homepage": "https://github.com/marcusklein/sot-backend-javascript#readme",
   "dependencies": {
-    "express": "^4.16.3"
+    "body-parser": "^1.18.3",
+    "express": "^4.16.3",
+    "node-geocoder": "^3.22.0",
+    "twitter": "^1.7.1"
   }
 }

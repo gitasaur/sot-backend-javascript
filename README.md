@@ -11,7 +11,6 @@ Topics we'll cover:
 * Node.js
 * Express
 * API's
-* Databases
 
 ## Prerequisites / Install
 
@@ -83,22 +82,20 @@ This should return the `process` object, containing information about the system
 
 # Let's make some stuff!
 
-Today we'll quickly build our own API using Node and Express. We'll display some data from twitter on a map, and collect and store data in a database.
+Today we'll quickly build our own API using Node and Express. We'll create our own custom search feed for Twitter.
 
 ## Project structure
 
 Have a look at the folder structure of this repo. You'll see we have two folders alongside `package.json` - 'public' and 'server'.
 
-The public folder is mostly completed for us and is the "front-end" to our application. Opening that folder you'll find `index.html` and `app.js` files. Opening `index.html` in the browser opens up a simple Google Map.
+The public folder is mostly completed for us and is the "front-end" to our application. Opening that folder you'll find `index.html` and `app.js` files. Opening `index.html` in the browser opens up a simple page with a form to add a new search subject.
 
 The other folder, 'server' is the one we'll be working out of. You'll see there is an empty file called `index.js`, open this in your editor.
 
 ## // TODO
 * Create a web server to serve our app
-* Create our own API
 * Get data from Twitter API
-* Display data on the map
-* Use a database to save data
+* Create our own API
 
 # Web server
 
@@ -155,3 +152,137 @@ If you didn't install nodemon before, install it with `npm i -g nodemon`
 * Written entirely in Node!
 
 Restart the server with `nodemon`.
+
+## Express Static Files
+“Static” files mean files that don’t change - they might be html, images, CSS files, and JavaScript - anything you want to be publically accessible.
+
+https://expressjs.com/en/starter/static-files.html
+
+In `server/index.js`, add at the top:
+```
+const path = require('path');
+```
+`path` is a special module that we've imported. Node comes with a few useful modules that we don't have to install, such as `fs` (file service, for manipulating files), but we still have to `require('fs')` if we want to use them.
+
+Next, lets add the static directory that we want to serve.
+```
+app.use(express.static(path.join(__dirname, '../public')));
+// remove/comment out this next line!
+// app.get('/', (req, res) => res.send('Hello World!'));
+``` 
+
+Now when we go to [http://localhost:3000](http://localhost:3000) we should see our map, again.
+
+For reference, this is what your `index.js` file should now look like:
+
+```
+const express = require('express');
+const app = express();
+const path = require('path');
+
+app.use(express.static(path.join(__dirname, 'public')));
+
+app.listen(3000, () => console.log('Our app is listening on port 3000!'));
+```
+
+It opens the `index.html` file because it looks for a file called 'index', and if one exists it serves that.
+
+So, we're serving files 🤟
+
+But, the real fun is creating an API to serve data.
+
+# APIs
+
+## What's an api?
+
+The simple answer, it's usually a collection of URLs (endpoints) that return data, instead of a webpage.
+
+e.g. [https://api.giphy.com/v1/gifs/translate?s=superman&api_key=dc6zaTOxFJmzC](https://api.giphy.com/v1/gifs/translate?s=superman&api_key=dc6zaTOxFJmzC)
+
+Heading to that link in your browser, should return a bunch of data related to superman gifs!
+
+Or. In your browser's console, paste in:
+
+```
+fetch('https://api.giphy.com/v1/gifs/translate?s=superman&api_key=dc6zaTOxFJmzC')
+.then((res) => res.json()
+.then((body) => console.log(body)));
+```
+
+Protip: Giphy is awesome. Use `/giphy [something]` in slack to generate random gifs to share. 
+
+## How to find APIs?
+
+Most tech companies will have one. Hit up google for them!
+
+e.g. google "Trade Me API"
+
+Favor the ones written well, with good code examples.
+
+## Can I access every public API?
+
+* No.
+* Well. Kinda. If you're polite.
+* Let's look at Authorization.
+
+## API Authorization
+
+* Most API's want to know who is consuming them.
+* Generally you will need to pass a unique key or token with your request to authorize yourself
+
+This was that `api_key` param we passed into the giphy URL before: **api_key=dc6zaTOxFJmzC** 
+
+* Generally before you use an API a company will make you sign up before they hand over a key.
+* These keys allow them to do things like rate limit your requests
+
+## Lets make our own API
+
+First we need to see what the data we are working with looks like.
+
+We'll look at the twitter api docs to see what is returned.
+
+https://developer.twitter.com/en/docs/tweets/search/api-reference/get-search-tweets.html
+
+Now, in `index.js`
+
+```
+const myData = {
+        statuses: [
+            { text: 'hello im a tweet'}
+        ]
+    };
+
+app.get('/api/results', (request, response) => {
+    response.json(myData);
+});
+```
+
+`response.json({ data goes here })` tells the browser to return in JSON format whatever we pass in (our myData object in this case). We can also use `response.send()`, as well of a bunch of other methods to return data/render pages.
+
+We should see our data come through on the front end.
+
+### Connecting to twitter
+
+We'd usually first make an account, then request for api keys. But I've gone ahead and done that for us.
+
+Twitter have also supplied [a nice module](https://www.npmjs.com/package/twitter) to use their API in Node applications.
+
+We can install this with:
+```
+npm i twitter
+``` 
+
+Then add the import statement up the top of `index.js`:
+```
+const Twitter = require('twitter');
+```
+
+Then in `index.js`
+```
+var client = new Twitter({
+    consumer_key: 'Qr4aLdymVjqPa0yfo3PDhOIzV',
+    consumer_secret: '4ONlJHN4sB2wcIT5TlVv6qAp241EbaRpfvHSYVA0BRt2dbcs7a',
+    access_token_key: '49913463-vDAqrW57QEJ3MeIdjGZ44SySVIUyxuejBTMvK0Zex',
+    access_token_secret: 'vnUeDACnevhjrWuVDppKevuvwzU0cntFiuliHs7Uu0xm0'
+  });
+```
