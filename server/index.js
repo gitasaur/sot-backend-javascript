@@ -5,16 +5,16 @@ const path = require('path');
 const Twitter = require('twitter');
 const bodyParser = require('body-parser');
 
-// // Middleware
-// app.use(bodyParser.json()); // support json encoded bodies
-// app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
+// Middleware
+app.use(bodyParser.json()); // support json encoded bodies
+app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 
-// var client = new Twitter({
-//     consumer_key: 'Qr4aLdymVjqPa0yfo3PDhOIzV',
-//     consumer_secret: '4ONlJHN4sB2wcIT5TlVv6qAp241EbaRpfvHSYVA0BRt2dbcs7a',
-//     access_token_key: '49913463-vDAqrW57QEJ3MeIdjGZ44SySVIUyxuejBTMvK0Zex',
-//     access_token_secret: 'vnUeDACnevhjrWuVDppKevuvwzU0cntFiuliHs7Uu0xm0'
-//   });
+var client = new Twitter({
+    consumer_key: 'Qr4aLdymVjqPa0yfo3PDhOIzV',
+    consumer_secret: '4ONlJHN4sB2wcIT5TlVv6qAp241EbaRpfvHSYVA0BRt2dbcs7a',
+    access_token_key: '49913463-vDAqrW57QEJ3MeIdjGZ44SySVIUyxuejBTMvK0Zex',
+    access_token_secret: 'vnUeDACnevhjrWuVDppKevuvwzU0cntFiuliHs7Uu0xm0'
+  });
 
 const subjects = [];
 
@@ -31,15 +31,10 @@ app.post('/api/subjects', (request, response) => {
     response.redirect('/'); // Refresh page
 });
 
-app.get('/api/results', (request, response) => {
-
-    response.json({
-        statuses: [{ text: 'hello'}]
-        });
-
-    // client.get('search/tweets', { q: subjects.join(' OR '), count: 100 }, function(error, tweets, response) {
-    //     res.json(tweets);
-    // });
+app.get('/api/results', (req, res) => {
+    client.get('search/tweets', { q: subjects.join(' OR '), count: 100 }, function(error, tweets, response) {
+        res.json(tweets);
+    });
 });
 
 app.listen(3000, () => console.log('Our app is listening on port 3000!'));

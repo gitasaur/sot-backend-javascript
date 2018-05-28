@@ -286,3 +286,79 @@ var client = new Twitter({
     access_token_secret: 'vnUeDACnevhjrWuVDppKevuvwzU0cntFiuliHs7Uu0xm0'
   });
 ```
+
+### Getting live data through
+
+Let's change our results endpoint to bring through some real data:
+
+```
+app.get('/api/results', (req, res) => {
+    client.get('search/tweets', { q: 'dogs', count: 100 }, function(error, tweets, response) {
+        res.json(tweets);
+    });
+});
+```
+
+Hopefully, we're getting data back relating to tweets about dogs.
+
+## Subjects
+
+Add a subject endpoint:
+
+```
+const subjects = [];
+
+app.post('/api/subjects', (request, response) => {
+    let newSubject = request.body.subject;
+    subjects.push(newSubject);
+
+    response.redirect('/'); // Refresh page
+});
+```
+
+You'll notice we are working with `request.body.subject`.
+
+This comes from when submitted (`action`).
+
+But, to get access to this we first need to add a small bit of middleware.
+
+## Body parser
+
+Body parser converts the text that comes from a form and places it in a "body" object of a `request`.
+
+Install it:
+```
+npm i body-parser
+```
+
+Include it:
+```
+const bodyParser = require('body-parser');
+
+// Middleware
+app.use(bodyParser.json()); // support json encoded bodies
+app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
+```
+
+Now, as we add subjects, we can push them to the `subjects` array.
+
+## Getting searches
+
+Home stretch! We only need an endpoint for adding searches.
+
+In `index.js`
+```
+app.get('/api/subjects', (request, response) => {
+    response.json(subjects);
+});
+```
+
+Now we just need to alter the search query.
+
+```
+    client.get('search/tweets', { q: subjects.join(' OR '), count: 100 }, function(error, tweets, response) {
+        res.json(tweets);
+    });
+```
+
+Trusting all went well - we should be able to see the data we put in, and use it!
